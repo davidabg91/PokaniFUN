@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Hearts from '../components/Hearts.jsx'
 import { HopefulChar } from '../components/Characters.jsx'
@@ -238,6 +239,25 @@ export default function CreatePage() {
                 </button>
               </div>
             </div>
+
+            {!user && (
+              <div className="mt-5 rounded-2xl border border-rose-glow/20 bg-rose-glow/5 p-4 text-left shadow-[0_0_15px_-5px_rgba(255,91,138,0.15)] animate-pop">
+                <h3 className="text-sm font-black text-rose-glow flex items-center gap-2">
+                  📊 {t('promo_reg_title')}
+                </h3>
+                <p className="mt-1.5 text-xs text-white/70 leading-relaxed">
+                  {t('promo_reg_desc')}
+                </p>
+                <div className="mt-3">
+                  <Link
+                    to="/register"
+                    className="inline-block text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/15 px-3.5 py-2 rounded-xl transition"
+                  >
+                    ✨ {t('promo_reg_btn')} →
+                  </Link>
+                </div>
+              </div>
+            )}
 
             <button
               onClick={() => {
