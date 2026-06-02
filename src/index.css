@@ -36,7 +36,8 @@ body {
 }
 
 .font-display {
-  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro Rounded", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.025em;
 }
 
 /* Glassy card */
