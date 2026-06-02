@@ -112,8 +112,8 @@ function TabButton({ active, onClick, title, desc }) {
 function RunawayDemo() {
   const { t } = useLang()
   const [step, setStep] = useState(0) // 0: initial, 1: dodge1, 2: dodge2, 3: transform, 4: clicked
-  const [btnPos, setBtnPos] = useState({ x: 30, y: 190 })
-  const [cursorPos, setCursorPos] = useState({ x: 120, y: 280 })
+  const [btnPos, setBtnPos] = useState({ x: 110, y: 48 })
+  const [cursorPos, setCursorPos] = useState({ x: 160, y: 100 })
 
   useEffect(() => {
     let alive = true
@@ -121,29 +121,29 @@ function RunawayDemo() {
       // Loop timeline
       while (alive) {
         setStep(0)
-        setBtnPos({ x: 70, y: 190 })
-        setCursorPos({ x: 120, y: 280 })
+        setBtnPos({ x: 110, y: 48 })
+        setCursorPos({ x: 160, y: 100 })
         await sleep(1500)
         if (!alive) break
 
         // Dodge 1
-        setCursorPos({ x: 100, y: 200 })
+        setCursorPos({ x: 125, y: 55 })
         await sleep(300)
-        setBtnPos({ x: 10, y: 110 })
+        setBtnPos({ x: 80, y: 15 })
         setStep(1)
         await sleep(1000)
         if (!alive) break
 
         // Dodge 2
-        setCursorPos({ x: 30, y: 120 })
+        setCursorPos({ x: 95, y: 25 })
         await sleep(300)
-        setBtnPos({ x: 60, y: 240 })
+        setBtnPos({ x: 110, y: 80 })
         setStep(2)
         await sleep(1000)
         if (!alive) break
 
         // Pre-transform & Chase to final
-        setCursorPos({ x: 80, y: 250 })
+        setCursorPos({ x: 125, y: 85 })
         await sleep(300)
         // Transform on 3rd attempt
         setStep(3)
@@ -151,7 +151,7 @@ function RunawayDemo() {
         if (!alive) break
 
         // Click it!
-        setCursorPos({ x: 100, y: 255 })
+        setCursorPos({ x: 120, y: 90 })
         await sleep(300)
         setStep(4) // clicked!
         await sleep(2500)
