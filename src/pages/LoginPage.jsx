@@ -35,7 +35,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-5 py-6">
+    <div className="relative min-h-screen flex items-center justify-center px-5 pt-16 pb-6 sm:pt-6">
       <Hearts count={15} />
 
       <div className="relative z-10 w-full max-w-md">

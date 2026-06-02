@@ -63,7 +63,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative min-h-screen px-4 py-8 pb-20">
+    <div className="relative min-h-screen px-4 pt-16 pb-20 sm:pt-8">
       <Hearts count={15} />
 
       <div className="relative z-10 mx-auto w-full max-w-2xl">
