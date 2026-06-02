@@ -55,35 +55,35 @@ export default function FeatureShowcase() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 {/* Tabs & Descriptions */}
                 <div className="flex flex-col gap-3 md:col-span-6 lg:col-span-7">
-                  {/* Tab 1 */}
+                  {/* Tab 1: How it works */}
                   <TabButton
                     active={activeTab === 0}
                     onClick={() => setActiveTab(0)}
-                    title={t('showcase_feature_1_title')}
-                    desc={t('showcase_feature_1_desc')}
-                  />
-                  {/* Tab 2 */}
-                  <TabButton
-                    active={activeTab === 1}
-                    onClick={() => setActiveTab(1)}
-                    title={t('showcase_feature_2_title')}
-                    desc={t('showcase_feature_2_desc')}
-                  />
-                  {/* Tab 3 */}
-                  <TabButton
-                    active={activeTab === 2}
-                    onClick={() => setActiveTab(2)}
-                    title={t('showcase_feature_3_title')}
-                    desc={t('showcase_feature_3_desc')}
-                  />
-                  {/* Tab 4 */}
-                  <TabButton
-                    active={activeTab === 3}
-                    onClick={() => setActiveTab(3)}
                     title={t('showcase_feature_4_title')}
                     desc={t('showcase_feature_4_desc')}
                   />
-                  {/* Tab 5 */}
+                  {/* Tab 2: Runaway NO */}
+                  <TabButton
+                    active={activeTab === 1}
+                    onClick={() => setActiveTab(1)}
+                    title={t('showcase_feature_1_title')}
+                    desc={t('showcase_feature_1_desc')}
+                  />
+                  {/* Tab 3: Pranks */}
+                  <TabButton
+                    active={activeTab === 2}
+                    onClick={() => setActiveTab(2)}
+                    title={t('showcase_feature_2_title')}
+                    desc={t('showcase_feature_2_desc')}
+                  />
+                  {/* Tab 4: Dashboard */}
+                  <TabButton
+                    active={activeTab === 3}
+                    onClick={() => setActiveTab(3)}
+                    title={t('showcase_feature_3_title')}
+                    desc={t('showcase_feature_3_desc')}
+                  />
+                  {/* Tab 5: Security */}
                   <TabButton
                     active={activeTab === 4}
                     onClick={() => setActiveTab(4)}
@@ -102,14 +102,14 @@ export default function FeatureShowcase() {
                     <div className="relative h-full w-full rounded-[28px] overflow-hidden bg-gradient-to-b from-indigo-950 to-slate-900 p-2">
                       
                       {/* Floating hearts inside the mockup screen */}
-                      <MockupHearts active={activeTab === 0 || activeTab === 2 || activeTab === 3} />
+                      <MockupHearts active={activeTab === 0 || activeTab === 1 || activeTab === 3} />
 
                       {/* Mockup Screens switcher */}
                       <AnimatePresence mode="wait">
-                        {activeTab === 0 && <RunawayDemo key="demo0" />}
-                        {activeTab === 1 && <PranksDemo key="demo1" />}
-                        {activeTab === 2 && <DashboardDemo key="demo2" />}
-                        {activeTab === 3 && <HowItWorksDemo key="demo3" />}
+                        {activeTab === 0 && <HowItWorksDemo key="demo0" />}
+                        {activeTab === 1 && <RunawayDemo key="demo1" />}
+                        {activeTab === 2 && <PranksDemo key="demo2" />}
+                        {activeTab === 3 && <DashboardDemo key="demo3" />}
                         {activeTab === 4 && <SecurityDemo key="demo4" />}
                       </AnimatePresence>
                     </div>
