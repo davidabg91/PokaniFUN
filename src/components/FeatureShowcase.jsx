@@ -7,21 +7,21 @@ export default function FeatureShowcase() {
   const { t } = useLang()
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState(0) // 0: button, 1: pranks, 2: dashboard, 3: how-it-works, 4: security
-  const containerRef = useRef(null)
+  const expandedRef = useRef(null)
 
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
-        containerRef.current?.scrollIntoView({
+        expandedRef.current?.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
+          block: 'center',
         })
-      }, 120)
+      }, 180)
     }
   }, [isOpen])
 
   return (
-    <div ref={containerRef} className="mt-8 w-full">
+    <div className="mt-8 w-full">
       {/* Centered Modern Pill Button */}
       <div className="flex justify-center">
         <button
@@ -63,7 +63,7 @@ export default function FeatureShowcase() {
             transition={{ duration: 0.4, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="glass mt-5 rounded-3xl border border-white/10 bg-black/40 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <div ref={expandedRef} className="glass mt-5 rounded-3xl border border-white/10 bg-black/40 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 {/* Tabs & Descriptions */}
                 <div className="flex flex-col gap-3 md:col-span-6 lg:col-span-7">
