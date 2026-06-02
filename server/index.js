@@ -2,8 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import { customAlphabet } from 'nanoid'
+import { extname, join } from 'node:path'
+import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, extname } from 'node:path'
 import fs from 'node:fs'
 import db from './db.js'
 import bcrypt from 'bcryptjs'
@@ -11,24 +12,13 @@ import jwt from 'jsonwebtoken'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const isProd = process.env.NODE_ENV === 'production'
-// In dev the API always uses 5174 (Vite proxies to it). Only honour PORT in
-// production, where Express also serves the built client on a single port.
 const PORT = isProd ? process.env.PORT || 5174 : 5174
 
 // Short, URL-friendly, non-confusing ids (no look-alike chars)
 const newId = customAlphabet('23456789abcdefghjkmnpqrstuvwxyz', 8)
 
-// Uploaded media (photos + voice notes) live on disk and are served statically.
-const uploadsDir = join(__dirname, 'uploads')
-fs.mkdirSync(uploadsDir, { recursive: true })
-
-const storage = multer.diskStorage({
-  destination: uploadsDir,
-  filename: (_req, file, cb) => {
-    const ext = (extname(file.originalname) || '').slice(0, 8).replace(/[^.\w]/g, '')
-    cb(null, `${newId()}${ext}`)
-  },
-})
+// Multer configured in-memory to support serverless deployment without local disk writing
+const storage = multer.memoryStorage()
 const upload = multer({
   storage,
   limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB per file
@@ -41,7 +31,6 @@ const upload = multer({
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '64kb' }))
-app.use('/uploads', express.static(uploadsDir))
 
 const JWT_SECRET = process.env.JWT_SECRET || 'pokani-fun-super-secret-key-98765'
 
@@ -88,9 +77,9 @@ function shape(inv, res) {
     recipientGender: inv.recipient_gender,
     kind: inv.kind,
     message: inv.message || '',
-    photoUrl: inv.photo ? `/uploads/${inv.photo}` : null,
-    audioUrl: inv.audio ? `/uploads/${inv.audio}` : null,
-    createdAt: inv.created_at,
+    photoUrl: inv.photo || null,
+    audioUrl: inv.audio || null,
+    createdAt: Number(inv.created_at),
     response: res
       ? {
           accepted: !!res.accepted,
@@ -99,83 +88,150 @@ function shape(inv, res) {
           activity: res.activity,
           food: res.food,
           dodges: res.dodges || 0,
-          createdAt: res.created_at,
+          createdAt: Number(res.created_at),
         }
       : null,
   }
 }
 
-// Create an invitation (optionally with a photo + voice note)
+// Create an invitation (uploaded straight to Supabase Storage bucket 'media')
 const mediaFields = upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'audio', maxCount: 1 },
 ])
 
 app.post('/api/invitations', authenticateToken, (req, res) => {
-  mediaFields(req, res, (err) => {
+  mediaFields(req, res, async (err) => {
     if (err) return res.status(400).json({ error: err.message || 'Грешка при качване' })
 
     const senderName = clean(req.body?.senderName, 60)
     if (!senderName) return res.status(400).json({ error: 'Липсва име на подателя' })
 
-    const recipientName = clean(req.body?.recipientName, 60)
-    const recipientGender = VALID_GENDERS.has(req.body?.recipientGender)
-      ? req.body.recipientGender
-      : 'female'
-    const kind = VALID_KINDS.has(req.body?.kind) ? req.body.kind : 'romantic'
-    const message = clean(req.body?.message, 400)
-    const photo = req.files?.photo?.[0]?.filename || null
-    const audio = req.files?.audio?.[0]?.filename || null
-    const userId = req.user?.id || null
+    try {
+      const recipientName = clean(req.body?.recipientName, 60)
+      const recipientGender = VALID_GENDERS.has(req.body?.recipientGender)
+        ? req.body.recipientGender
+        : 'female'
+      const kind = VALID_KINDS.has(req.body?.kind) ? req.body.kind : 'romantic'
+      const message = clean(req.body?.message, 400)
+      const userId = req.user?.id || null
 
-    const id = newId()
-    db.prepare(
-      `INSERT INTO invitations (id, sender_name, recipient_name, recipient_gender, kind, message, photo, audio, user_id, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(id, senderName, recipientName, recipientGender, kind, message, photo, audio, userId, Date.now())
+      let photoUrl = null
+      let audioUrl = null
 
-    res.json({ id })
+      if (req.files?.photo?.[0]) {
+        const photoFile = req.files.photo[0]
+        const ext = (extname(photoFile.originalname) || '').slice(0, 8).replace(/[^.\w]/g, '')
+        const filename = `${newId()}${ext}`
+        const { error: storageErr } = await db.storage
+          .from('media')
+          .upload(filename, photoFile.buffer, {
+            contentType: photoFile.mimetype,
+          })
+        if (storageErr) throw storageErr
+        const { data: { publicUrl } } = db.storage.from('media').getPublicUrl(filename)
+        photoUrl = publicUrl
+      }
+
+      if (req.files?.audio?.[0]) {
+        const audioFile = req.files.audio[0]
+        const ext = (extname(audioFile.originalname) || '').slice(0, 8).replace(/[^.\w]/g, '')
+        const filename = `${newId()}${ext}`
+        const { error: storageErr } = await db.storage
+          .from('media')
+          .upload(filename, audioFile.buffer, {
+            contentType: audioFile.mimetype,
+          })
+        if (storageErr) throw storageErr
+        const { data: { publicUrl } } = db.storage.from('media').getPublicUrl(filename)
+        audioUrl = publicUrl
+      }
+
+      const id = newId()
+      const { error } = await db
+        .from('invitations')
+        .insert({
+          id,
+          sender_name: senderName,
+          recipient_name: recipientName,
+          recipient_gender: recipientGender,
+          kind,
+          message,
+          photo: photoUrl,
+          audio: audioUrl,
+          user_id: userId,
+          created_at: Date.now()
+        })
+
+      if (error) throw error
+      res.json({ id })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: error.message || 'Сървърна грешка при създаване на поканата' })
+    }
   })
 })
 
 // Read an invitation (+ response if exists)
-app.get('/api/invitations/:id', (req, res) => {
-  const inv = db.prepare('SELECT * FROM invitations WHERE id = ?').get(req.params.id)
-  if (!inv) return res.status(404).json({ error: 'Поканата не е намерена' })
-  const resp = db.prepare('SELECT * FROM responses WHERE invitation_id = ?').get(req.params.id)
-  res.json(shape(inv, resp))
+app.get('/api/invitations/:id', async (req, res) => {
+  try {
+    const { data: inv, error: invErr } = await db
+      .from('invitations')
+      .select('*')
+      .eq('id', req.params.id)
+      .single()
+
+    if (invErr || !inv) return res.status(404).json({ error: 'Поканата не е намерена' })
+
+    const { data: resp } = await db
+      .from('responses')
+      .select('*')
+      .eq('invitation_id', req.params.id)
+      .maybeSingle()
+
+    res.json(shape(inv, resp))
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Сървърна грешка' })
+  }
 })
 
 // Save the recipient's answer
-app.post('/api/invitations/:id/response', (req, res) => {
-  const inv = db.prepare('SELECT * FROM invitations WHERE id = ?').get(req.params.id)
-  if (!inv) return res.status(404).json({ error: 'Поканата не е намерена' })
+app.post('/api/invitations/:id/response', async (req, res) => {
+  try {
+    const { data: inv, error: invErr } = await db
+      .from('invitations')
+      .select('id')
+      .eq('id', req.params.id)
+      .single()
+    if (invErr || !inv) return res.status(404).json({ error: 'Поканата не е намерена' })
 
-  const accepted = req.body?.accepted === false ? 0 : 1
-  const date = clean(req.body?.date, 20)
-  const time = clean(req.body?.time, 10)
-  const activity = VALID_ACTIVITIES.has(req.body?.activity) ? req.body.activity : null
-  const food = clean(req.body?.food, 30) || null
-  const dodges = Math.max(0, Math.min(999, parseInt(req.body?.dodges, 10) || 0))
+    const accepted = req.body?.accepted === false ? 0 : 1
+    const date = clean(req.body?.date, 20)
+    const time = clean(req.body?.time, 10)
+    const activity = VALID_ACTIVITIES.has(req.body?.activity) ? req.body.activity : null
+    const food = clean(req.body?.food, 30) || null
+    const dodges = Math.max(0, Math.min(999, parseInt(req.body?.dodges, 10) || 0))
 
-  db.prepare(
-    `INSERT INTO responses (invitation_id, accepted, date, time, activity, food, dodges, created_at)
-     VALUES (@id, @accepted, @date, @time, @activity, @food, @dodges, @created_at)
-     ON CONFLICT(invitation_id) DO UPDATE SET
-       accepted=@accepted, date=@date, time=@time, activity=@activity,
-       food=@food, dodges=@dodges, created_at=@created_at`
-  ).run({
-    id: req.params.id,
-    accepted,
-    date,
-    time,
-    activity,
-    food,
-    dodges,
-    created_at: Date.now(),
-  })
+    const { error } = await db
+      .from('responses')
+      .upsert({
+        invitation_id: req.params.id,
+        accepted,
+        date,
+        time,
+        activity,
+        food,
+        dodges,
+        created_at: Date.now(),
+      })
 
-  res.json({ ok: true })
+    if (error) throw error
+    res.json({ ok: true })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Грешка при записване на отговора' })
+  }
 })
 
 // --- Auth Routes ---
@@ -196,7 +252,12 @@ app.post('/api/auth/register', async (req, res) => {
   }
 
   try {
-    const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username)
+    const { data: existing } = await db
+      .from('users')
+      .select('id')
+      .eq('username', username)
+      .maybeSingle()
+
     if (existing) {
       return res.status(400).json({ error: 'Потребителското име вече е заето' })
     }
@@ -204,13 +265,18 @@ app.post('/api/auth/register', async (req, res) => {
     const userId = newId()
     const passwordHash = await bcrypt.hash(password, 10)
 
-    db.prepare(
-      `INSERT INTO users (id, username, password_hash, created_at)
-       VALUES (?, ?, ?, ?)`
-    ).run(userId, username, passwordHash, Date.now())
+    const { error } = await db
+      .from('users')
+      .insert({
+        id: userId,
+        username,
+        password_hash: passwordHash,
+        created_at: Date.now()
+      })
+
+    if (error) throw error
 
     const token = jwt.sign({ id: userId, username }, JWT_SECRET, { expiresIn: '30d' })
-
     res.json({ token, user: { id: userId, username } })
   } catch (error) {
     console.error(error)
@@ -227,8 +293,13 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
-    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username)
-    if (!user) {
+    const { data: user, error } = await db
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .maybeSingle()
+
+    if (!user || error) {
       return res.status(400).json({ error: 'Невалидно потребителско име или парола' })
     }
 
@@ -238,7 +309,6 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '30d' })
-
     res.json({ token, user: { id: user.id, username: user.username } })
   } catch (error) {
     console.error(error)
@@ -251,13 +321,27 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
 })
 
 // --- User Routes ---
-app.get('/api/user/invitations', requireAuth, (req, res) => {
+app.get('/api/user/invitations', requireAuth, async (req, res) => {
   try {
-    const invitations = db.prepare('SELECT * FROM invitations WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id)
-    const data = invitations.map(inv => {
-      const resp = db.prepare('SELECT * FROM responses WHERE invitation_id = ?').get(inv.id)
-      return shape(inv, resp)
-    })
+    const { data: invitations, error } = await db
+      .from('invitations')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    const data = await Promise.all(
+      invitations.map(async (inv) => {
+        const { data: resp } = await db
+          .from('responses')
+          .select('*')
+          .eq('invitation_id', inv.id)
+          .maybeSingle()
+        return shape(inv, resp)
+      })
+    )
+
     res.json(data)
   } catch (error) {
     console.error(error)
@@ -277,3 +361,4 @@ if (isProd) {
 app.listen(PORT, () => {
   console.log(`💌  API listening on http://localhost:${PORT}`)
 })
+export default app
