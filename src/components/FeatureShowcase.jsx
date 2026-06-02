@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../i18n.jsx'
 import { HopefulChar, HappyChar, SexyCat } from './Characters.jsx'
@@ -7,9 +7,21 @@ export default function FeatureShowcase() {
   const { t } = useLang()
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState(0) // 0: button, 1: pranks, 2: dashboard, 3: how-it-works, 4: security
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        containerRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }, 120)
+    }
+  }, [isOpen])
 
   return (
-    <div className="mt-8 w-full">
+    <div ref={containerRef} className="mt-8 w-full">
       {/* Centered Modern Pill Button */}
       <div className="flex justify-center">
         <button
