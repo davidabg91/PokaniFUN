@@ -62,7 +62,7 @@ export default function RunawayNo({ onDodge, onAccept, kind, gender }) {
       className={`select-none whitespace-nowrap rounded-2xl border px-7 py-3.5 text-lg font-extrabold transition-all duration-300 ${
         isYes
           ? 'border-transparent bg-gradient-to-r from-rose-glow to-fuchsia-500 text-white shadow-[0_14px_34px_-8px_rgba(255,45,111,.8)] hover:scale-105 active:scale-95'
-          : 'border-white/20 bg-white/10 text-white/80'
+          : 'border-white/20 bg-slate-950 text-white/90 shadow-[0_10px_30px_rgba(0,0,0,0.6)]'
       }`}
       style={{
         transition: 'transform .2s ease, left .25s cubic-bezier(.22,1,.36,1), top .25s cubic-bezier(.22,1,.36,1), background-color .3s, border-color .3s, shadow .3s',
