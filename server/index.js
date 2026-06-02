@@ -6,7 +6,7 @@ import { extname, join } from 'node:path'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
-import db from './db.js'
+import db, { supabaseUrl } from './db.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -295,7 +295,8 @@ app.post('/api/auth/register', async (req, res) => {
     res.json({ token, user: { id: userId, username } })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: `Сървърна грешка при регистрация: ${error.message || error}` })
+    const detail = error.cause ? ` (${error.cause.message || error.cause})` : ''
+    res.status(500).json({ error: `Сървърна грешка при регистрация: ${error.message}${detail} [URL: ${supabaseUrl}]` })
   }
 })
 
