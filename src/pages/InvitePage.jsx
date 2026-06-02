@@ -6,7 +6,7 @@ import Burst from '../components/Burst.jsx'
 import RunawayNo from '../components/RunawayNo.jsx'
 import { HopefulChar, HappyChar, SexyCat } from '../components/Characters.jsx'
 import { getInvitation, saveResponse } from '../api.js'
-import { ACTIVITIES, FOODS, activityEmoji, foodEmoji, bgEmojis } from '../lib.js'
+import { getActivities, getFoods, activityEmoji, foodEmoji, bgEmojis } from '../lib.js'
 import { useLang, readyWord, prettyDate, timePrank } from '../i18n.jsx'
 
 const variants = {
@@ -137,6 +137,13 @@ export default function InvitePage() {
     }
   }
 
+  const getCancelMsg = () => {
+    if (inv.kind !== 'friendly') return t('cancel_msg')
+    if (inv.recipientGender === 'male') return t('cancel_msg_friendly_male')
+    if (inv.recipientGender === 'female') return t('cancel_msg_friendly_female')
+    return t('cancel_msg_friendly_other')
+  }
+
   return (
     <div className={`relative min-h-screen overflow-hidden px-5 py-8 ${preview ? 'pt-14' : ''}`}>
       {preview && (
@@ -187,7 +194,7 @@ export default function InvitePage() {
                 >
                   {t('btn_yes')}
                 </button>
-                <RunawayNo onDodge={setDodges} onAccept={sayYes} />
+                <RunawayNo onDodge={setDodges} onAccept={sayYes} kind={inv.kind} gender={inv.recipientGender} />
               </div>
               <div className="mt-5 h-5 text-xs text-white/50">
                 <AnimatePresence mode="wait">
@@ -282,7 +289,7 @@ export default function InvitePage() {
             <Step key="activity">
               <StepTitle emoji="✨">{t('activity_title')}</StepTitle>
               <div className="mt-5 grid grid-cols-2 gap-3">
-                {ACTIVITIES.map((a) => (
+                {getActivities(inv.kind, inv.recipientGender).map((a) => (
                   <BigChoice
                     key={a.key}
                     active={answer.activity === a.key}
@@ -298,7 +305,7 @@ export default function InvitePage() {
               />
               <NextBtn
                 disabled={!answer.activity}
-                onClick={() => (answer.activity === 'restaurant' ? setStep('food') : finish())}
+                onClick={() => (['cinema', 'walk', 'escape', 'party'].includes(answer.activity) ? finish() : setStep('food'))}
               />
             </Step>
           )}
@@ -308,7 +315,7 @@ export default function InvitePage() {
             <Step key="food">
               <StepTitle emoji="🍴">{t('food_title')}</StepTitle>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {FOODS.map((f) => (
+                {getFoods(answer.activity).map((f) => (
                   <BigChoice
                     key={f.key}
                     active={answer.food === f.key}
@@ -361,7 +368,7 @@ export default function InvitePage() {
                   <Recap label={t(friendly ? 'recap_from' : 'recap_with')}>{inv.senderName}</Recap>
                 </div>
 
-                <Countdown date={answer.date} time={answer.time} />
+                <Countdown date={answer.date} time={answer.time} kind={inv.kind} gender={inv.recipientGender} />
               </div>
 
               <div className="mt-5">
@@ -373,7 +380,7 @@ export default function InvitePage() {
                       animate={{ opacity: 1, scale: 1 }}
                       className="font-display text-lg font-extrabold text-gradient"
                     >
-                      {t('cancel_msg')}
+                      {getCancelMsg()}
                     </motion.p>
                   ) : (
                     <motion.button
@@ -518,7 +525,7 @@ function QuipBubble({ text, keyName }) {
 }
 
 // Live countdown to the chosen date + time.
-function Countdown({ date, time }) {
+function Countdown({ date, time, kind, gender }) {
   const { t } = useLang()
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
@@ -542,8 +549,16 @@ function Countdown({ date, time }) {
     [Math.floor((diff % 60000) / 1000), t('cd_sec')],
   ]
 
+  const getCautionMsg = () => {
+    if (kind !== 'friendly') return ''
+    if (gender === 'male') return t('caution_friendly_male')
+    if (gender === 'female') return t('caution_friendly_female')
+    return t('caution_friendly_other')
+  }
+  const caution = getCautionMsg()
+
   return (
-    <div className="mt-4 border-t border-white/10 pt-3 text-center">
+    <div className="mt-4 border-t border-white/10 pt-3 text-center flex flex-col items-center">
       <p className="mb-1 text-xs font-bold uppercase tracking-wider text-white/50">
         {t('countdown_label')}
       </p>
@@ -555,6 +570,11 @@ function Countdown({ date, time }) {
           </div>
         ))}
       </div>
+      {caution && (
+        <p className="mt-3 text-[11px] font-bold text-rose-300/80 bg-white/5 py-1.5 px-3.5 rounded-xl border border-white/5 inline-block">
+          {caution}
+        </p>
+      )}
     </div>
   )
 }

@@ -64,7 +64,12 @@ function requireAuth(req, res, next) {
 
 const VALID_GENDERS = new Set(['female', 'male', 'other'])
 const VALID_KINDS = new Set(['romantic', 'friendly'])
-const VALID_ACTIVITIES = new Set(['restaurant', 'cinema', 'walk', 'bowling'])
+const VALID_ACTIVITIES = new Set([
+  'restaurant', 'cinema', 'walk', 'bowling',
+  'beer', 'match', 'gaming', 'billiards',
+  'gossip', 'cocktails', 'shopping', 'beauty',
+  'escape', 'party'
+])
 
 const clean = (v, max = 120) =>
   typeof v === 'string' ? v.trim().slice(0, max) : ''

@@ -5,9 +5,16 @@ const MAX_DODGES = 9 // after this many dodges the button gives up and becomes Y
 
 // The "НЕ" button that refuses to be clicked: dodges the cursor on desktop,
 // teleports on touch on mobile, stays normal size, then becomes "ДА" after max dodges.
-export default function RunawayNo({ onDodge, onAccept }) {
+export default function RunawayNo({ onDodge, onAccept, kind, gender }) {
   const { t } = useLang()
-  const TEASES = t('no_teases')
+  
+  const getTeaseKey = () => {
+    if (kind !== 'friendly') return 'no_teases'
+    if (gender === 'male') return 'no_teases_friendly_male'
+    if (gender === 'female') return 'no_teases_friendly_female'
+    return 'no_teases_friendly_other'
+  }
+  const TEASES = t(getTeaseKey())
   const ref = useRef(null)
   const [moved, setMoved] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
