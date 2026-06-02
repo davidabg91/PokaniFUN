@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang, prettyDate } from '../i18n.jsx'
 import Hearts from '../components/Hearts.jsx'
 import { HopefulChar, HappyChar } from '../components/Characters.jsx'
+import AdBanner from '../components/AdBanner.jsx'
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -263,6 +264,7 @@ export default function DashboardPage() {
             })}
           </div>
         )}
+        <AdBanner />
       </div>
     </div>
   )
