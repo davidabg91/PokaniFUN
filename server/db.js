@@ -4,7 +4,8 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-dotenv.config({ path: join(__dirname, '..', '.env') })
+const envResult = dotenv.config({ path: join(__dirname, '..', '.env') })
+export const dotenvError = envResult.error ? envResult.error.message : `Success (Keys: ${Object.keys(envResult.parsed || {}).join(',')})`
 
 export const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder-url.supabase.co'
 const supabaseKey = process.env.SUPABASE_KEY || 'placeholder-key'
