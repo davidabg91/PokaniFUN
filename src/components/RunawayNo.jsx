@@ -1,20 +1,22 @@
 import { useRef, useState, useCallback } from 'react'
 import { useLang } from '../i18n.jsx'
 
-const MAX_DODGES = 9 // after this many dodges the button gives up and vanishes
+const MAX_DODGES = 9 // after this many dodges the button gives up and becomes YES
 
 // The "НЕ" button that refuses to be clicked: dodges the cursor on desktop,
-// teleports on touch on mobile, shrinks with every attempt, then disappears.
-export default function RunawayNo({ onDodge }) {
+// teleports on touch on mobile, stays normal size, then becomes "ДА" after max dodges.
+export default function RunawayNo({ onDodge, onAccept }) {
   const { t } = useLang()
   const TEASES = t('no_teases')
   const ref = useRef(null)
   const [moved, setMoved] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const [tries, setTries] = useState(0)
-  const [gone, setGone] = useState(false)
+
+  const isYes = tries >= MAX_DODGES
 
   const jump = useCallback(() => {
+    if (tries >= MAX_DODGES) return
     const el = ref.current
     const w = el?.offsetWidth || 120
     const h = el?.offsetHeight || 56
@@ -28,10 +30,9 @@ export default function RunawayNo({ onDodge }) {
     setTries((t) => {
       const next = t + 1
       onDodge?.(next)
-      if (next >= MAX_DODGES) setGone(true)
       return next
     })
-  }, [onDodge])
+  }, [onDodge, tries])
 
   const block = (e) => {
     e.preventDefault()
@@ -39,33 +40,32 @@ export default function RunawayNo({ onDodge }) {
     jump()
   }
 
-  if (gone) return null
-
-  // Shrink as it gets chased, but never smaller than a tiny nub.
-  const scale = Math.max(0.32, 1 - tries * 0.1)
-
   return (
     <button
       ref={ref}
       type="button"
       // Desktop: flee when the cursor gets near.
-      onMouseEnter={jump}
-      onMouseDown={block}
+      onMouseEnter={isYes ? undefined : jump}
+      onMouseDown={isYes ? undefined : block}
       // Mobile: teleport the instant a finger touches it, before a click fires.
-      onTouchStart={block}
-      onPointerDown={block}
-      onClick={block}
-      aria-label="Не (не може да се натисне)"
-      className="select-none whitespace-nowrap rounded-2xl border border-white/20 bg-white/10 px-7 py-3.5 text-lg font-extrabold text-white/80 backdrop-blur"
+      onTouchStart={isYes ? undefined : block}
+      onPointerDown={isYes ? undefined : block}
+      onClick={isYes ? onAccept : block}
+      aria-label={isYes ? t('btn_yes') : "Не (не може да се натисне)"}
+      className={`select-none whitespace-nowrap rounded-2xl border px-7 py-3.5 text-lg font-extrabold transition-all duration-300 backdrop-blur ${
+        isYes
+          ? 'border-transparent bg-gradient-to-r from-rose-glow to-fuchsia-500 text-white shadow-[0_14px_34px_-8px_rgba(255,45,111,.8)] hover:scale-105 active:scale-95'
+          : 'border-white/20 bg-white/10 text-white/80'
+      }`}
       style={{
-        transform: `scale(${scale})`,
-        transition: 'transform .2s ease, left .25s cubic-bezier(.22,1,.36,1), top .25s cubic-bezier(.22,1,.36,1)',
+        transition: 'transform .2s ease, left .25s cubic-bezier(.22,1,.36,1), top .25s cubic-bezier(.22,1,.36,1), background-color .3s, border-color .3s, shadow .3s',
         ...(moved
           ? { position: 'fixed', left: pos.x, top: pos.y, zIndex: 50 }
           : {}),
       }}
     >
-      {TEASES[Math.min(tries, TEASES.length - 1)]}
+      {isYes ? t('btn_yes') : TEASES[Math.min(tries, TEASES.length - 1)]}
     </button>
   )
 }
+

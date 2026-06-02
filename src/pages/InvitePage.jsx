@@ -177,7 +177,7 @@ export default function InvitePage() {
                 >
                   {t('btn_yes')}
                 </button>
-                <RunawayNo onDodge={setDodges} />
+                <RunawayNo onDodge={setDodges} onAccept={sayYes} />
               </div>
               <div className="mt-5 h-5 text-xs text-white/50">
                 <AnimatePresence mode="wait">
