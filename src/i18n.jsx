@@ -163,6 +163,16 @@ const STRINGS = {
     sent_to: ({ name }) => `✅ Отговорът ти е изпратен на ${name}!`,
     preview_banner: '👀 Режим Преглед — твоите тестови отговори няма да бъдат записани в базата данни.',
     create_own_invite: '✨ Искаш ли и ти да изпратиш покана? Създай я оттук! 💌',
+    showcase_title: '💡 Виж какви забавни неща има в поканата! (Натисни за преглед)',
+    showcase_hide: 'Скрий прегледа ▲',
+    showcase_feature_1_title: '🏃 Бягащият бутон „НЕ“',
+    showcase_feature_1_desc: 'Получателят не може да натисне „Не“ — бутонът постоянно бяга от пръста/курсора и накрая се предава, ставайки бутон „ДА! 💖“!',
+    showcase_feature_2_title: '🗓️ Шеги с дата & час',
+    showcase_feature_2_desc: 'Ако получателят избере конкретен ден или твърде ранна/късна среща, сайтът автоматично се шегува с него с изскачащи балончета.',
+    showcase_feature_3_title: '📊 Проследяване на живо',
+    showcase_feature_3_desc: 'В твоя Dashboard виждаш отговора в реално време, плюс статистика точно колко пъти получателят се е опитал да избяга с „Не“!',
+    showcase_demo_dodge_counter: 'Опити за бягство: ',
+    showcase_demo_accepted: 'Среща на: ',
 
     /* --- Results page --- */
     your_invite: '📊 Твоята покана',
@@ -405,6 +415,16 @@ const STRINGS = {
     sent_to: ({ name }) => `✅ Your answer was sent to ${name}!`,
     preview_banner: '👀 Preview Mode — your test responses will not be saved to the database.',
     create_own_invite: '✨ Want to send an invitation yourself? Create it here! 💌',
+    showcase_title: '💡 See what fun things are inside the invitation! (Click to preview)',
+    showcase_hide: 'Hide preview ▲',
+    showcase_feature_1_title: '🏃 The fleeing "NO" button',
+    showcase_feature_1_desc: 'The recipient can never click "No" — the button constantly flees from their finger/cursor, and finally gives up, morphing into a "YES! 💖" button!',
+    showcase_feature_2_title: '🗓️ Date & Time pranks',
+    showcase_feature_2_desc: 'If the recipient chooses a specific day or a date that is too early/late, the website automatically teases them with funny speech bubbles.',
+    showcase_feature_3_title: '📊 Live dashboard tracking',
+    showcase_feature_3_desc: 'In your dashboard, you can see their answer in real-time, plus stats on how many times they tried to click "No"!',
+    showcase_demo_dodge_counter: 'Attempts to dodge: ',
+    showcase_demo_accepted: 'Date set for: ',
 
     /* --- Results page --- */
     your_invite: '📊 Your invitation',

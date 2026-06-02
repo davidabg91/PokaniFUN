@@ -8,6 +8,7 @@ import { bgEmojis } from '../lib.js'
 import { useLang } from '../i18n.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import AdBanner from '../components/AdBanner.jsx'
+import FeatureShowcase from '../components/FeatureShowcase.jsx'
 
 const genders = [
   { key: 'female', emoji: '👩' },
@@ -252,6 +253,7 @@ export default function CreatePage() {
           </motion.div>
         )}
         <AdBanner />
+        <FeatureShowcase />
       </div>
     </div>
   )
