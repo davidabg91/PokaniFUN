@@ -15,16 +15,11 @@
   ],
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "server/index.js"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/heart.svg",
-      "dest": "/heart.svg"
     },
     {
       "src": "/(.*)",
