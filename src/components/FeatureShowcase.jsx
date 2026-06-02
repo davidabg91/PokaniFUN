@@ -94,7 +94,7 @@ export default function FeatureShowcase() {
 
                 {/* Animated Mockup Viewport */}
                 <div className="flex justify-center items-center md:col-span-6 lg:col-span-5">
-                  <div className="relative aspect-[9/16] w-full max-w-[240px] rounded-[36px] border-4 border-white/20 bg-slate-950 p-3 shadow-2xl shadow-rose-glow/10 overflow-hidden">
+                  <div className="relative w-[240px] h-[427px] rounded-[36px] border-4 border-white/20 bg-slate-950 p-3 shadow-2xl shadow-rose-glow/10 overflow-hidden shrink-0">
                     {/* Speaker notch */}
                     <div className="absolute top-1 left-1/2 h-3.5 w-20 -translate-x-1/2 rounded-full bg-slate-900 border border-white/10 z-30" />
                     
