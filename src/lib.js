@@ -101,7 +101,7 @@ export const foodEmoji = (key) => EMOJIS[key] || ''
 
 // Floating-background emoji sets, themed by invitation kind + recipient gender.
 const BG = {
-  romantic: ['❤️', '💖', '💘', '💕', '💗', '💓', '🌹', '✨', '💞', '😍'],
+  romantic: ['❤️', '💖', '💘', '💕', '💗', '💓', '💞', '💝', '💟', '❤️‍🔥'],
   friendlyMale: ['🍺', '⚽', '🎮', '🏀', '🎸', '🍕', '😎', '🚗', '🏆', '🎯', '🎲', '🥁'],
   friendlyFemale: ['☕', '🍷', '🛍️', '💅', '🌸', '🧁', '📸', '💃', '🎶', '🥂', '🌷', '🍓'],
   friendlyOther: ['🎉', '🍕', '☕', '🎮', '🍺', '🎶', '😄', '🎲', '🍿', '🥤', '🎸', '🏓'],

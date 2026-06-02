@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-const ROMANTIC = ['❤️', '💖', '💘', '💕', '💗', '💓', '🌹', '✨', '💞']
+const ROMANTIC = ['❤️', '💖', '💘', '💕', '💗', '💓', '💞', '💝', '💟', '❤️‍🔥']
 
 // A field of emoji that drift upward forever. Pure CSS animation -> buttery smooth.
 // `emojis` lets the caller theme the background (romantic hearts, friendly hangout, etc.).
