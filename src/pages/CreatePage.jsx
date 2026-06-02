@@ -89,8 +89,13 @@ export default function CreatePage() {
         <motion.header
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-3 text-center"
+          className="mb-3 text-center flex flex-col items-center"
         >
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-2 rounded-2xl shadow-[0_8px_25px_-5px_rgba(255,91,138,.6)] border border-white/10"
+          />
           <h1 className="font-display text-3xl font-extrabold sm:text-4xl">
             <span className="text-gradient">{t('create_title')}</span>
           </h1>

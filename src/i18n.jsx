@@ -7,7 +7,7 @@ import { createContext, useContext, useState, useCallback } from 'react'
 const STRINGS = {
   bg: {
     /* --- Create page --- */
-    create_title: 'Покани ме 💘',
+    create_title: 'Покани ме',
     create_subtitle: 'Създай супер забавна покана и прати линка на специалния човек.',
     field_your_name: 'Твоето име',
     ph_your_name: 'напр. Алекс',
@@ -173,7 +173,7 @@ const STRINGS = {
 
   en: {
     /* --- Create page --- */
-    create_title: 'Invite Me 💘',
+    create_title: 'Invite Me',
     create_subtitle: 'Create a super fun invitation and send the link to your special someone.',
     field_your_name: 'Your name',
     ph_your_name: 'e.g. Alex',
