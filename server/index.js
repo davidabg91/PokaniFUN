@@ -338,6 +338,16 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({ user: req.user })
 })
 
+app.get('/api/debug-env', (req, res) => {
+  res.json({
+    keys: Object.keys(process.env).filter(k => k.startsWith('SUPABASE') || k.startsWith('JWT') || k === 'NODE_ENV'),
+    hasUrl: !!process.env.SUPABASE_URL,
+    hasKey: !!process.env.SUPABASE_KEY,
+    hasJwt: !!process.env.JWT_SECRET,
+    urlValueStart: process.env.SUPABASE_URL ? process.env.SUPABASE_URL.substring(0, 15) : null
+  })
+})
+
 // --- User Routes ---
 app.get('/api/user/invitations', requireAuth, async (req, res) => {
   try {
