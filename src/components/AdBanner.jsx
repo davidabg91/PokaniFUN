@@ -12,7 +12,7 @@ export default function AdBanner() {
   }, [])
 
   return (
-    <div className="w-full my-6 p-2 rounded-2xl border border-white/10 bg-white/5 flex flex-col items-center justify-center min-h-[95px] overflow-hidden select-none">
+    <div className="w-full my-6 flex flex-col items-center justify-center overflow-hidden select-none">
       <span className="text-[9px] uppercase tracking-wider text-white/30 font-bold mb-1">Реклама / Advertisement</span>
       
       {/* 
