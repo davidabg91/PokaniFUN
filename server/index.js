@@ -128,7 +128,7 @@ app.post('/api/invitations', authenticateToken, (req, res) => {
           .upload(filename, photoFile.buffer, {
             contentType: photoFile.mimetype,
           })
-        if (storageErr) throw storageErr
+        if (storageErr) throw new Error(`Грешка при качване на снимка: ${storageErr.message}`)
         const { data: { publicUrl } } = db.storage.from('media').getPublicUrl(filename)
         photoUrl = publicUrl
       }
@@ -142,7 +142,7 @@ app.post('/api/invitations', authenticateToken, (req, res) => {
           .upload(filename, audioFile.buffer, {
             contentType: audioFile.mimetype,
           })
-        if (storageErr) throw storageErr
+        if (storageErr) throw new Error(`Грешка при качване на аудио: ${storageErr.message}`)
         const { data: { publicUrl } } = db.storage.from('media').getPublicUrl(filename)
         audioUrl = publicUrl
       }
@@ -181,18 +181,25 @@ app.get('/api/invitations/:id', async (req, res) => {
       .eq('id', req.params.id)
       .single()
 
-    if (invErr || !inv) return res.status(404).json({ error: 'Поканата не е намерена' })
+    if (invErr) {
+      if (invErr.code === 'PGRST116') {
+        return res.status(404).json({ error: 'Поканата не е намерена' })
+      }
+      throw invErr
+    }
 
-    const { data: resp } = await db
+    const { data: resp, error: respErr } = await db
       .from('responses')
       .select('*')
       .eq('invitation_id', req.params.id)
       .maybeSingle()
 
+    if (respErr) throw respErr
+
     res.json(shape(inv, resp))
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Сървърна грешка' })
+    res.status(500).json({ error: `Сървърна грешка при четене на покана: ${error.message}` })
   }
 })
 
@@ -204,7 +211,13 @@ app.post('/api/invitations/:id/response', async (req, res) => {
       .select('id')
       .eq('id', req.params.id)
       .single()
-    if (invErr || !inv) return res.status(404).json({ error: 'Поканата не е намерена' })
+
+    if (invErr) {
+      if (invErr.code === 'PGRST116') {
+        return res.status(404).json({ error: 'Поканата не е намерена' })
+      }
+      throw invErr
+    }
 
     const accepted = req.body?.accepted === false ? 0 : 1
     const date = clean(req.body?.date, 20)
@@ -230,7 +243,7 @@ app.post('/api/invitations/:id/response', async (req, res) => {
     res.json({ ok: true })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Грешка при записване на отговора' })
+    res.status(500).json({ error: `Грешка при записване на отговора: ${error.message}` })
   }
 })
 
@@ -252,11 +265,13 @@ app.post('/api/auth/register', async (req, res) => {
   }
 
   try {
-    const { data: existing } = await db
+    const { data: existing, error: selectError } = await db
       .from('users')
       .select('id')
       .eq('username', username)
       .maybeSingle()
+
+    if (selectError) throw selectError
 
     if (existing) {
       return res.status(400).json({ error: 'Потребителското име вече е заето' })
@@ -280,7 +295,7 @@ app.post('/api/auth/register', async (req, res) => {
     res.json({ token, user: { id: userId, username } })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Сървърна грешка при регистрация' })
+    res.status(500).json({ error: `Сървърна грешка при регистрация: ${error.message || error}` })
   }
 })
 
@@ -299,7 +314,9 @@ app.post('/api/auth/login', async (req, res) => {
       .eq('username', username)
       .maybeSingle()
 
-    if (!user || error) {
+    if (error) throw error
+
+    if (!user) {
       return res.status(400).json({ error: 'Невалидно потребителско име или парола' })
     }
 
@@ -312,7 +329,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({ token, user: { id: user.id, username: user.username } })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Сървърна грешка при вход' })
+    res.status(500).json({ error: `Сървърна грешка при вход: ${error.message}` })
   }
 })
 
@@ -333,11 +350,12 @@ app.get('/api/user/invitations', requireAuth, async (req, res) => {
 
     const data = await Promise.all(
       invitations.map(async (inv) => {
-        const { data: resp } = await db
+        const { data: resp, error: respErr } = await db
           .from('responses')
           .select('*')
           .eq('invitation_id', inv.id)
           .maybeSingle()
+        if (respErr) throw respErr
         return shape(inv, resp)
       })
     )
@@ -345,7 +363,7 @@ app.get('/api/user/invitations', requireAuth, async (req, res) => {
     res.json(data)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Грешка при извличане на поканите' })
+    res.status(500).json({ error: `Грешка при извличане на поканите: ${error.message}` })
   }
 })
 
