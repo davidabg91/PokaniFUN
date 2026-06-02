@@ -6,37 +6,40 @@ import { HopefulChar, HappyChar, SexyCat } from './Characters.jsx'
 export default function FeatureShowcase() {
   const { t } = useLang()
   const [isOpen, setIsOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState(0) // 0: button, 1: pranks, 2: dashboard
+  const [activeTab, setActiveTab] = useState(0) // 0: button, 1: pranks, 2: dashboard, 3: how-it-works, 4: security
 
   return (
     <div className="mt-8 w-full">
-      {/* Collapsed Header Bar */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative group overflow-hidden flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-display text-base font-extrabold text-white transition-all hover:border-rose-glow/50 hover:bg-white/10 hover:shadow-[0_0_20px_-3px_rgba(255,91,138,0.25)]"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-rose-glow/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-        
-        <span className="relative z-10 flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-glow/10 text-rose-glow border border-rose-glow/20 group-hover:scale-110 transition-transform duration-300">
-            {isOpen ? '💡' : '✨'}
+      {/* Centered Modern Pill Button */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative group overflow-hidden flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-2.5 font-display text-sm font-extrabold text-white/95 transition-all duration-300 hover:border-rose-glow/50 hover:bg-white/10 hover:shadow-[0_0_20px_-3px_rgba(255,91,138,0.35)]"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-glow/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          
+          <span className="relative z-10 flex items-center gap-2">
+            <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-rose-glow/10 text-rose-glow border border-rose-glow/20 group-hover:scale-110 transition-transform duration-300 text-xs">
+              <span className="absolute inset-0 rounded-full bg-rose-glow/20 animate-ping opacity-75" />
+              ℹ️
+            </span>
+            <span className="group-hover:text-rose-glow transition-colors duration-200">
+              {isOpen ? t('showcase_hide') : t('showcase_title')}
+            </span>
           </span>
-          <span className="group-hover:text-rose-glow transition-colors duration-200">
-            {isOpen ? t('showcase_hide') : t('showcase_title')}
+          <span className="relative z-10 text-white/50 group-hover:text-white transition-colors duration-200">
+            <svg
+              className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={3}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </span>
-        </span>
-        <span className="relative z-10 text-white/50 group-hover:text-white transition-colors duration-200">
-          <svg
-            className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={3}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </span>
-      </button>
+        </button>
+      </div>
 
       {/* Expanded Showcase Area */}
       <AnimatePresence>
@@ -48,7 +51,7 @@ export default function FeatureShowcase() {
             transition={{ duration: 0.4, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="glass mt-3 rounded-3xl border border-white/10 bg-black/40 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <div className="glass mt-5 rounded-3xl border border-white/10 bg-black/40 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 {/* Tabs & Descriptions */}
                 <div className="flex flex-col gap-3 md:col-span-6 lg:col-span-7">
@@ -73,6 +76,20 @@ export default function FeatureShowcase() {
                     title={t('showcase_feature_3_title')}
                     desc={t('showcase_feature_3_desc')}
                   />
+                  {/* Tab 4 */}
+                  <TabButton
+                    active={activeTab === 3}
+                    onClick={() => setActiveTab(3)}
+                    title={t('showcase_feature_4_title')}
+                    desc={t('showcase_feature_4_desc')}
+                  />
+                  {/* Tab 5 */}
+                  <TabButton
+                    active={activeTab === 4}
+                    onClick={() => setActiveTab(4)}
+                    title={t('showcase_feature_5_title')}
+                    desc={t('showcase_feature_5_desc')}
+                  />
                 </div>
 
                 {/* Animated Mockup Viewport */}
@@ -85,13 +102,15 @@ export default function FeatureShowcase() {
                     <div className="relative h-full w-full rounded-[28px] overflow-hidden bg-gradient-to-b from-indigo-950 to-slate-900 p-2">
                       
                       {/* Floating hearts inside the mockup screen */}
-                      <MockupHearts active={activeTab === 0 || activeTab === 2} />
+                      <MockupHearts active={activeTab === 0 || activeTab === 2 || activeTab === 3} />
 
                       {/* Mockup Screens switcher */}
                       <AnimatePresence mode="wait">
                         {activeTab === 0 && <RunawayDemo key="demo0" />}
                         {activeTab === 1 && <PranksDemo key="demo1" />}
                         {activeTab === 2 && <DashboardDemo key="demo2" />}
+                        {activeTab === 3 && <HowItWorksDemo key="demo3" />}
+                        {activeTab === 4 && <SecurityDemo key="demo4" />}
                       </AnimatePresence>
                     </div>
                   </div>
@@ -419,6 +438,151 @@ function MockupHearts({ active }) {
           </motion.span>
         ))}
       </AnimatePresence>
+    </div>
+  )
+}
+
+/* ---------- Animation 4: How It Works Demo ---------- */
+function HowItWorksDemo() {
+  const { t } = useLang()
+  const [activeStep, setActiveStep] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % 4)
+    }, 1800)
+    return () => clearInterval(interval)
+  }, [])
+
+  const steps = [
+    { num: '1', title: t('showcase_demo_how_step_1'), icon: '✍️' },
+    { num: '2', title: t('showcase_demo_how_step_2'), icon: '📤' },
+    { num: '3', title: t('showcase_demo_how_step_3'), icon: '💖' },
+    { num: '4', title: t('showcase_demo_how_step_4'), icon: '📊' },
+  ]
+
+  return (
+    <div className="relative flex h-full w-full flex-col justify-between py-5 text-white select-none">
+      <div className="text-center border-b border-white/5 pb-2">
+        <span className="text-[7px] font-black text-rose-glow tracking-widest block uppercase">
+          {t('showcase_demo_how_subtitle')}
+        </span>
+        <h4 className="font-display text-[10px] font-black text-white mt-0.5">
+          {t('showcase_demo_how_title')}
+        </h4>
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center gap-2 px-1 mt-2">
+        {steps.map((step, idx) => {
+          const isActive = idx === activeStep
+          const isCompleted = idx < activeStep
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0.5, x: -5 }}
+              animate={{
+                opacity: isActive ? 1 : isCompleted ? 0.8 : 0.45,
+                scale: isActive ? 1.04 : 1,
+              }}
+              transition={{ duration: 0.3 }}
+              className={`flex items-center gap-2 rounded-xl p-2 border transition-all ${
+                isActive
+                  ? 'bg-rose-glow/10 border-rose-glow/30 shadow-[0_0_10px_rgba(255,91,138,0.15)]'
+                  : 'bg-white/5 border-white/5'
+              }`}
+            >
+              <div
+                className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[9px] font-black transition-colors ${
+                  isActive
+                    ? 'bg-rose-glow text-white'
+                    : isCompleted
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-white/10 text-white/40'
+                }`}
+              >
+                {isCompleted ? '✓' : step.num}
+              </div>
+              <div className="text-[9px] text-left leading-tight">
+                <span className={`block font-bold ${isActive ? 'text-rose-glow' : 'text-white/90'}`}>
+                  {step.title}
+                </span>
+              </div>
+              <span className="ml-auto text-xs">{step.icon}</span>
+            </motion.div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ---------- Animation 5: Security & Privacy Demo ---------- */
+function SecurityDemo() {
+  const { t } = useLang()
+  const [pulse, setPulse] = useState(true)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPulse((p) => !p)
+    }, 1500)
+    return () => clearInterval(interval)
+  }, [])
+
+  const securityItems = [
+    { title: t('showcase_demo_sec_item_1_title'), desc: t('showcase_demo_sec_item_1_desc') },
+    { title: t('showcase_demo_sec_item_2_title'), desc: t('showcase_demo_sec_item_2_desc') },
+    { title: t('showcase_demo_sec_item_3_title'), desc: t('showcase_demo_sec_item_3_desc') },
+  ]
+
+  return (
+    <div className="relative flex h-full w-full flex-col justify-between py-5 text-white select-none">
+      <div className="text-center border-b border-white/5 pb-2">
+        <span className="text-[7px] font-black text-rose-glow tracking-widest block uppercase">
+          {t('showcase_demo_sec_subtitle')}
+        </span>
+        <h4 className="font-display text-[10px] font-black text-white mt-0.5">
+          {t('showcase_demo_sec_title')}
+        </h4>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center my-2 gap-3">
+        {/* Animated Shield/Lock */}
+        <div className="relative my-1">
+          <motion.div
+            animate={{ scale: pulse ? [1, 1.2, 1] : 1 }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="absolute inset-0 rounded-full bg-rose-glow/20 blur-md pointer-events-none"
+          />
+          <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-rose-glow to-fuchsia-600 border border-white/20 shadow-lg shadow-rose-glow/20">
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Security checks */}
+        <div className="w-full space-y-1.5 px-1">
+          {securityItems.map((item, idx) => (
+            <div key={idx} className="flex items-start gap-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 p-1.5">
+              <span className="text-[9px] text-emerald-400 font-extrabold mt-0.5">✓</span>
+              <div className="text-left leading-none">
+                <span className="block text-[8px] font-black text-white/95">{item.title}</span>
+                <span className="text-[6.5px] text-white/40 block mt-0.5">{item.desc}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="text-[7.5px] text-white/40 text-center font-bold">
+        {t('showcase_demo_sec_footer')}
+      </div>
     </div>
   )
 }
