@@ -126,6 +126,7 @@ const STRINGS = {
     cancel_msg: 'Тц, няма отказване! 😘💘',
     sent_to: ({ name }) => `✅ Отговорът ти е изпратен на ${name}!`,
     preview_banner: '👀 Режим Преглед — твоите тестови отговори няма да бъдат записани в базата данни.',
+    create_own_invite: '✨ Искаш ли и ти да изпратиш покана? Създай я оттук! 💌',
 
     /* --- Results page --- */
     your_invite: '📊 Твоята покана',
@@ -293,6 +294,7 @@ const STRINGS = {
     cancel_msg: 'Nope, no cancelling! 😘💘',
     sent_to: ({ name }) => `✅ Your answer was sent to ${name}!`,
     preview_banner: '👀 Preview Mode — your test responses will not be saved to the database.',
+    create_own_invite: '✨ Want to send an invitation yourself? Create it here! 💌',
 
     /* --- Results page --- */
     your_invite: '📊 Your invitation',

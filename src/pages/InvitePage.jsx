@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Hearts from '../components/Hearts.jsx'
 import Burst from '../components/Burst.jsx'
@@ -395,6 +395,15 @@ export default function InvitePage() {
               </div>
 
               <p className="mt-4 text-sm text-white/60">{t('sent_to', { name: inv.senderName })}</p>
+
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <Link
+                  to="/"
+                  className="inline-block rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-extrabold text-white/90 transition-all hover:scale-[1.03] hover:bg-white/10 hover:text-white active:scale-95 shadow-[0_8px_20px_-6px_rgba(0,0,0,0.5)]"
+                >
+                  {t('create_own_invite')}
+                </Link>
+              </div>
             </Step>
           )}
         </AnimatePresence>
