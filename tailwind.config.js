@@ -14,11 +14,12 @@ export default {
       },
       keyframes: {
         float: {
-          '0%': { transform: 'translate(0,0) rotate(0deg)', opacity: '0' },
+          '0%': { transform: 'translate(0, 0) rotate(-8deg)', opacity: '0' },
           '10%': { opacity: '0.9' },
+          '50%': { transform: 'translate(calc(var(--drift, 0px) * 0.5), -55vh) rotate(8deg)' },
           '90%': { opacity: '0.9' },
           '100%': {
-            transform: 'translate(var(--drift,0), -110vh) rotate(360deg)',
+            transform: 'translate(var(--drift, 0px), -110vh) rotate(-8deg)',
             opacity: '0',
           },
         },

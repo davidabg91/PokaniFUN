@@ -85,7 +85,7 @@ export default function CreatePage() {
 
   return (
     <div className="relative min-h-screen px-5 pt-16 pb-6 sm:pt-6">
-      <Hearts count={20} emojis={bgEmojis(form.kind, form.recipientGender)} />
+      <Hearts count={20} kind={form.kind} emojis={bgEmojis(form.kind, form.recipientGender)} />
 
       <div className="relative z-10 mx-auto w-full max-w-xl">
         <motion.header

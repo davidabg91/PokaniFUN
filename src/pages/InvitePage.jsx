@@ -155,7 +155,7 @@ export default function InvitePage() {
           {t('preview_banner')}
         </div>
       )}
-      <Hearts count={friendly ? 24 : 28} emojis={bgEmojis(inv.kind, inv.recipientGender)} />
+      <Hearts count={friendly ? 24 : 28} kind={inv.kind} emojis={bgEmojis(inv.kind, inv.recipientGender)} />
       {burst && <Burst emojis={friendly ? ['🎉', '🥳', '⭐', '💛', '✨'] : undefined} />}
 
       <div className="relative z-10 mx-auto flex min-h-[88vh] w-full max-w-xl flex-col items-center justify-center">
