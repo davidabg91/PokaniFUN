@@ -22,7 +22,7 @@ function Navigation() {
   if (isRecipientView) return null
 
   return (
-    <div className="fixed left-3 top-3 z-[60] flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1 backdrop-blur text-xs sm:text-sm">
+    <div className="fixed left-3 top-3 z-[60] flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1 text-xs sm:text-sm">
       {user ? (
         <>
           <Link

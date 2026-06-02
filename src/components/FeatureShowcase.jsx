@@ -13,13 +13,29 @@ export default function FeatureShowcase() {
       {/* Collapsed Header Bar */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="glass flex w-full items-center justify-between rounded-2xl border border-white/10 px-5 py-4 font-display text-base font-extrabold text-white transition-all hover:bg-white/10"
+        className="relative group overflow-hidden flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-display text-base font-extrabold text-white transition-all hover:border-rose-glow/50 hover:bg-white/10 hover:shadow-[0_0_20px_-3px_rgba(255,91,138,0.25)]"
       >
-        <span className="flex items-center gap-2">
-          <span>{isOpen ? '💡' : '✨'}</span>
-          {isOpen ? t('showcase_hide') : t('showcase_title')}
+        <div className="absolute inset-0 bg-gradient-to-r from-rose-glow/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        
+        <span className="relative z-10 flex items-center gap-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-glow/10 text-rose-glow border border-rose-glow/20 group-hover:scale-110 transition-transform duration-300">
+            {isOpen ? '💡' : '✨'}
+          </span>
+          <span className="group-hover:text-rose-glow transition-colors duration-200">
+            {isOpen ? t('showcase_hide') : t('showcase_title')}
+          </span>
         </span>
-        <span className="text-white/60">{isOpen ? '▲' : '▼'}</span>
+        <span className="relative z-10 text-white/50 group-hover:text-white transition-colors duration-200">
+          <svg
+            className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
       </button>
 
       {/* Expanded Showcase Area */}
@@ -32,7 +48,7 @@ export default function FeatureShowcase() {
             transition={{ duration: 0.4, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="glass mt-3 rounded-3xl border border-white/10 bg-black/40 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur">
+            <div className="glass mt-3 rounded-3xl border border-white/10 bg-black/40 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
                 {/* Tabs & Descriptions */}
                 <div className="flex flex-col gap-3 md:col-span-6 lg:col-span-7">

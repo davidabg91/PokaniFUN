@@ -147,7 +147,7 @@ export default function InvitePage() {
   return (
     <div className={`relative min-h-screen overflow-hidden px-5 py-8 ${preview ? 'pt-14' : ''}`}>
       {preview && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500/95 py-2.5 px-4 text-center text-xs font-black text-slate-900 shadow-md backdrop-blur-md">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500/95 py-2.5 px-4 text-center text-xs font-black text-slate-900 shadow-md">
           {t('preview_banner')}
         </div>
       )}
@@ -448,7 +448,7 @@ function Centered({ children }) {
 function FromBadge({ inv }) {
   const { t } = useLang()
   return (
-    <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-bold backdrop-blur">
+    <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-bold">
       <span>{inv.kind === 'friendly' ? '🎉' : '💌'}</span>
       {t('from_badge')} <span className="text-gradient">{inv.senderName}</span>
     </div>

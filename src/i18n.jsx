@@ -586,7 +586,7 @@ const LANGS = [
 export function LanguageToggle() {
   const { lang, setLang } = useLang()
   return (
-    <div className="fixed right-3 top-3 z-[60] flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1 backdrop-blur">
+    <div className="fixed right-3 top-3 z-[60] flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1">
       {LANGS.map((l) => (
         <button
           key={l.code}
