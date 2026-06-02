@@ -94,7 +94,7 @@ export default function CreatePage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-3 text-center"
         >
-          <h1 className="font-display text-3xl font-extrabold sm:text-4xl">
+          <h1 className="font-romantic text-4xl sm:text-5xl">
             <span className="text-gradient">{t('create_title')}</span> 💘
           </h1>
           <p className="mt-1 text-sm text-white/70">{t('create_subtitle')}</p>
