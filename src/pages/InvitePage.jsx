@@ -23,6 +23,8 @@ export default function InvitePage() {
   const [inv, setInv] = useState(null)
   const [error, setError] = useState('')
   const [step, setStep] = useState('ask')
+  
+  const preview = new URLSearchParams(window.location.search).get('preview') === 'true'
   const [burst, setBurst] = useState(false)
 
   const [answer, setAnswer] = useState({
@@ -125,6 +127,9 @@ export default function InvitePage() {
 
   const finish = async () => {
     setStep('final')
+    if (preview) {
+      return // skip saving response in preview mode
+    }
     try {
       await saveResponse(id, { accepted: true, ...answer, dodges })
     } catch {
@@ -133,7 +138,12 @@ export default function InvitePage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden px-5 py-8">
+    <div className={`relative min-h-screen overflow-hidden px-5 py-8 ${preview ? 'pt-14' : ''}`}>
+      {preview && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500/95 py-2.5 px-4 text-center text-xs font-black text-slate-900 shadow-md backdrop-blur-md">
+          {t('preview_banner')}
+        </div>
+      )}
       <Hearts count={friendly ? 24 : 28} emojis={bgEmojis(inv.kind, inv.recipientGender)} />
       {burst && <Burst emojis={friendly ? ['🎉', '🥳', '⭐', '💛', '✨'] : undefined} />}
 

@@ -209,7 +209,7 @@ export default function CreatePage() {
 
             <div className="mt-3 flex gap-2">
               <a
-                href={inviteUrl}
+                href={`${inviteUrl}?preview=true`}
                 target="_blank"
                 rel="noreferrer"
                 className="flex-1 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 font-bold hover:bg-white/20"

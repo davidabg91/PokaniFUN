@@ -125,6 +125,7 @@ const STRINGS = {
     btn_cancel_date: 'Откажи срещата 🙈',
     cancel_msg: 'Тц, няма отказване! 😘💘',
     sent_to: ({ name }) => `✅ Отговорът ти е изпратен на ${name}!`,
+    preview_banner: '👀 Режим Преглед — твоите тестови отговори няма да бъдат записани в базата данни.',
 
     /* --- Results page --- */
     your_invite: '📊 Твоята покана',
@@ -291,6 +292,7 @@ const STRINGS = {
     btn_cancel_date: 'Cancel the date 🙈',
     cancel_msg: 'Nope, no cancelling! 😘💘',
     sent_to: ({ name }) => `✅ Your answer was sent to ${name}!`,
+    preview_banner: '👀 Preview Mode — your test responses will not be saved to the database.',
 
     /* --- Results page --- */
     your_invite: '📊 Your invitation',

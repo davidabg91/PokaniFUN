@@ -233,7 +233,7 @@ export default function DashboardPage() {
                           <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center">
                             <p className="text-amber-300 text-xs font-bold mb-2">Очаква се отговор на поканата</p>
                             <Link
-                              to={`/i/${inv.id}`}
+                              to={`/i/${inv.id}?preview=true`}
                               target="_blank"
                               className="inline-block text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 px-4 py-2 rounded-xl border border-amber-500/20 transition"
                             >
