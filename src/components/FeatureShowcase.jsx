@@ -242,7 +242,7 @@ function RunawayDemo() {
           className={`absolute rounded-xl px-3 py-1.5 text-[10px] font-black select-none pointer-events-none border ${
             step >= 3
               ? 'border-transparent bg-gradient-to-r from-rose-glow to-fuchsia-500 shadow-md text-white'
-              : 'border-white/10 bg-slate-950 text-white/90 shadow-md'
+              : 'border-white/10 bg-white/10 text-white/80'
           }`}
           style={{ left: btnPos.x, top: btnPos.y }}
         >
