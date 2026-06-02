@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join, extname } from 'node:path'
 import fs from 'node:fs'
 import db from './db.js'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const isProd = process.env.NODE_ENV === 'production'
@@ -40,6 +42,36 @@ const app = express()
 app.use(cors())
 app.use(express.json({ limit: '64kb' }))
 app.use('/uploads', express.static(uploadsDir))
+
+const JWT_SECRET = process.env.JWT_SECRET || 'pokani-fun-super-secret-key-98765'
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (!token) {
+    req.user = null
+    return next()
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      req.user = null
+      return next()
+    }
+    req.user = user
+    next()
+  })
+}
+
+function requireAuth(req, res, next) {
+  authenticateToken(req, res, () => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Неоторизиран достъп. Моля, влезте в профила си.' })
+    }
+    next()
+  })
+}
 
 const VALID_GENDERS = new Set(['female', 'male', 'other'])
 const VALID_KINDS = new Set(['romantic', 'friendly'])
@@ -79,7 +111,7 @@ const mediaFields = upload.fields([
   { name: 'audio', maxCount: 1 },
 ])
 
-app.post('/api/invitations', (req, res) => {
+app.post('/api/invitations', authenticateToken, (req, res) => {
   mediaFields(req, res, (err) => {
     if (err) return res.status(400).json({ error: err.message || 'Грешка при качване' })
 
@@ -94,12 +126,13 @@ app.post('/api/invitations', (req, res) => {
     const message = clean(req.body?.message, 400)
     const photo = req.files?.photo?.[0]?.filename || null
     const audio = req.files?.audio?.[0]?.filename || null
+    const userId = req.user?.id || null
 
     const id = newId()
     db.prepare(
-      `INSERT INTO invitations (id, sender_name, recipient_name, recipient_gender, kind, message, photo, audio, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(id, senderName, recipientName, recipientGender, kind, message, photo, audio, Date.now())
+      `INSERT INTO invitations (id, sender_name, recipient_name, recipient_gender, kind, message, photo, audio, user_id, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(id, senderName, recipientName, recipientGender, kind, message, photo, audio, userId, Date.now())
 
     res.json({ id })
   })
@@ -143,6 +176,93 @@ app.post('/api/invitations/:id/response', (req, res) => {
   })
 
   res.json({ ok: true })
+})
+
+// --- Auth Routes ---
+app.post('/api/auth/register', async (req, res) => {
+  const username = clean(req.body?.username, 30).toLowerCase()
+  const password = req.body?.password
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Потребителското име и паролата са задължителни' })
+  }
+
+  if (username.length < 3) {
+    return res.status(400).json({ error: 'Потребителското име трябва да е поне 3 символа' })
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Паролата трябва да е поне 6 символа' })
+  }
+
+  try {
+    const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username)
+    if (existing) {
+      return res.status(400).json({ error: 'Потребителското име вече е заето' })
+    }
+
+    const userId = newId()
+    const passwordHash = await bcrypt.hash(password, 10)
+
+    db.prepare(
+      `INSERT INTO users (id, username, password_hash, created_at)
+       VALUES (?, ?, ?, ?)`
+    ).run(userId, username, passwordHash, Date.now())
+
+    const token = jwt.sign({ id: userId, username }, JWT_SECRET, { expiresIn: '30d' })
+
+    res.json({ token, user: { id: userId, username } })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Сървърна грешка при регистрация' })
+  }
+})
+
+app.post('/api/auth/login', async (req, res) => {
+  const username = clean(req.body?.username, 30).toLowerCase()
+  const password = req.body?.password
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Потребителското име и паролата са задължителни' })
+  }
+
+  try {
+    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username)
+    if (!user) {
+      return res.status(400).json({ error: 'Невалидно потребителско име или парола' })
+    }
+
+    const match = await bcrypt.compare(password, user.password_hash)
+    if (!match) {
+      return res.status(400).json({ error: 'Невалидно потребителско име или парола' })
+    }
+
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '30d' })
+
+    res.json({ token, user: { id: user.id, username: user.username } })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Сървърна грешка при вход' })
+  }
+})
+
+app.get('/api/auth/me', requireAuth, (req, res) => {
+  res.json({ user: req.user })
+})
+
+// --- User Routes ---
+app.get('/api/user/invitations', requireAuth, (req, res) => {
+  try {
+    const invitations = db.prepare('SELECT * FROM invitations WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id)
+    const data = invitations.map(inv => {
+      const resp = db.prepare('SELECT * FROM responses WHERE invitation_id = ?').get(inv.id)
+      return shape(inv, resp)
+    })
+    res.json(data)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Грешка при извличане на поканите' })
+  }
 })
 
 // Serve the built client in production

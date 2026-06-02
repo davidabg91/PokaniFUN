@@ -8,6 +8,13 @@ const db = new Database(join(__dirname, 'data.db'))
 db.pragma('journal_mode = WAL')
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id            TEXT PRIMARY KEY,
+    username      TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at    INTEGER NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS invitations (
     id               TEXT PRIMARY KEY,
     sender_name      TEXT NOT NULL,
@@ -17,7 +24,9 @@ db.exec(`
     message          TEXT,
     photo            TEXT,   -- uploaded image filename (in /uploads)
     audio            TEXT,   -- uploaded/recorded voice filename (in /uploads)
-    created_at       INTEGER NOT NULL
+    user_id          TEXT,   -- link to users(id) if logged in
+    created_at       INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
   );
 
   CREATE TABLE IF NOT EXISTS responses (
@@ -33,10 +42,11 @@ db.exec(`
   );
 `)
 
-// Lightweight migration: add media columns to pre-existing databases.
+// Lightweight migration: add media and auth columns to pre-existing databases.
 const cols = db.prepare('PRAGMA table_info(invitations)').all().map((c) => c.name)
 if (!cols.includes('photo')) db.exec('ALTER TABLE invitations ADD COLUMN photo TEXT')
 if (!cols.includes('audio')) db.exec('ALTER TABLE invitations ADD COLUMN audio TEXT')
+if (!cols.includes('user_id')) db.exec('ALTER TABLE invitations ADD COLUMN user_id TEXT')
 
 const respCols = db.prepare('PRAGMA table_info(responses)').all().map((c) => c.name)
 if (!respCols.includes('dodges'))

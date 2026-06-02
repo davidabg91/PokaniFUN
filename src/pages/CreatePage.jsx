@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Hearts from '../components/Hearts.jsx'
 import { HopefulChar } from '../components/Characters.jsx'
@@ -6,6 +6,7 @@ import { PhotoPicker, VoiceRecorder } from '../components/MediaInputs.jsx'
 import { createInvitation } from '../api.js'
 import { bgEmojis } from '../lib.js'
 import { useLang } from '../i18n.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 const genders = [
   { key: 'female', emoji: '👩' },
@@ -14,14 +15,21 @@ const genders = [
 ]
 
 export default function CreatePage() {
+  const { user } = useAuth()
   const { t } = useLang()
   const [form, setForm] = useState({
-    senderName: '',
+    senderName: user ? user.username : '',
     recipientName: '',
     recipientGender: 'female',
     kind: 'romantic',
     message: '',
   })
+
+  useEffect(() => {
+    if (user && !form.senderName) {
+      setForm((f) => ({ ...f, senderName: user.username }))
+    }
+  }, [user, form.senderName])
   const [photo, setPhoto] = useState(null)
   const [audio, setAudio] = useState(null)
   const [loading, setLoading] = useState(false)
