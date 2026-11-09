@@ -621,30 +621,61 @@ export function timePrank(time, t) {
   return null
 }
 
+// Real SVG flags — emoji flags don't render on Windows (they show "BG"/"GB" text instead).
+function FlagBG({ className }) {
+  return (
+    <svg viewBox="0 0 5 3" className={className} preserveAspectRatio="none" aria-hidden="true">
+      <rect width="5" height="3" fill="#fff" />
+      <rect width="5" height="1" y="1" fill="#00966e" />
+      <rect width="5" height="1" y="2" fill="#d62612" />
+    </svg>
+  )
+}
+
+function FlagGB({ className }) {
+  return (
+    <svg viewBox="0 0 60 30" className={className} preserveAspectRatio="none" aria-hidden="true">
+      <clipPath id="uk-border">
+        <path d="M0,0 v30 h60 v-30 z" />
+      </clipPath>
+      <clipPath id="uk-diag">
+        <path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z" />
+      </clipPath>
+      <g clipPath="url(#uk-border)">
+        <path d="M0,0 v30 h60 v-30 z" fill="#012169" />
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+        <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#uk-diag)" stroke="#c8102e" strokeWidth="4" />
+        <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+        <path d="M30,0 v30 M0,15 h60" stroke="#c8102e" strokeWidth="6" />
+      </g>
+    </svg>
+  )
+}
+
 // The floating language switch — a flag toggle (active flag highlighted).
 const LANGS = [
-  { code: 'bg', flag: '🇧🇬', label: 'Български' },
-  { code: 'en', flag: '🇬🇧', label: 'English' },
+  { code: 'bg', Flag: FlagBG, label: 'Български' },
+  { code: 'en', Flag: FlagGB, label: 'English' },
 ]
 
 export function LanguageToggle() {
   const { lang, setLang } = useLang()
   return (
-    <div className="fixed right-3 top-3 z-[60] flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1">
-      {LANGS.map((l) => (
+    <div className="fixed right-3 top-3 z-[60] flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1 backdrop-blur">
+      {LANGS.map(({ code, Flag, label }) => (
         <button
-          key={l.code}
-          onClick={() => setLang(l.code)}
-          aria-label={l.label}
-          aria-pressed={lang === l.code}
-          title={l.label}
-          className={`rounded-full px-2.5 py-1 text-lg leading-none transition ${
-            lang === l.code
-              ? 'bg-white/25 shadow-[0_0_0_2px_rgba(255,91,138,.6)]'
-              : 'opacity-50 hover:opacity-90'
+          key={code}
+          onClick={() => setLang(code)}
+          aria-label={label}
+          aria-pressed={lang === code}
+          title={label}
+          className={`overflow-hidden rounded-md transition ${
+            lang === code
+              ? 'opacity-100 shadow-[0_0_0_2px_rgba(255,91,138,.7)]'
+              : 'opacity-45 hover:opacity-80'
           }`}
         >
-          {l.flag}
+          <Flag className="block h-5 w-7" />
         </button>
       ))}
     </div>
